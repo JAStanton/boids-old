@@ -1,4 +1,4 @@
-boids
+Boids
 =====
 
 Coffeescript Boids implementation
