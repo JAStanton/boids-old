@@ -1,0 +1,4 @@
+boids
+=====
+
+Coffeescript Boids implementation
