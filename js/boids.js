@@ -66,13 +66,14 @@
     };
 
     Boids.prototype.moveBoids = function() {
-      var b, v1, _i, _len, _ref, _results;
+      var b, v1, v2, _i, _len, _ref, _results;
       _ref = this.boids;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         b = _ref[_i];
         v1 = this.rule1(b);
-        b.velocity = vectorAdd(b.velocity, v1);
+        v2 = this.rule2(b);
+        b.velocity = vectorAdd(vectorAdd(b.velocity, v1), v2);
         _results.push(b.position = vectorAdd(b.position, b.velocity));
       }
       return _results;
@@ -102,6 +103,23 @@
       percieved_center = vectorDivide(percieved_center, this.boids.length - 1);
       return vectorDivide(vectorSubtract(percieved_center, boid.position), this.BOID_LEVEL_OF_ATTRACTION);
     };
+
+    Boids.prototype.rule2 = function(boid) {
+      var b, c, _i, _len, _ref;
+      c = new Vector(0, 0);
+      _ref = this.boids;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        b = _ref[_i];
+        if (b !== boid) {
+          if (Math.abs(vectorSubtract(b.position, boid.position)) < 100) {
+            c = vectorSubtract(c, vectorSubtract(b.position, boid.position));
+          }
+        }
+      }
+      return c;
+    };
+
+    Boids.prototype.rule3 = function(boid) {};
 
     Boids.prototype.initCanvas = function() {
       this.canvas = document.getElementById(this.options.canvas_id);

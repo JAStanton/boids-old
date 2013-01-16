@@ -54,10 +54,10 @@ class window.Boids
   moveBoids: ->
     for b in @boids
       v1 = @rule1 b
-      # v2 = @rule2 b
+      v2 = @rule2 b
       # v3 = @rule3 b
 
-      b.velocity = vectorAdd(b.velocity, v1)
+      b.velocity = vectorAdd(vectorAdd(b.velocity, v1), v2)
       b.position = vectorAdd(b.position, b.velocity)
 
   drawBoids: ->
@@ -65,13 +65,27 @@ class window.Boids
       @drawCircle b.position.x, b.position.y
 
   rule1: (boid) ->
-    percieved_center = new Vector(0,0)
+    percieved_center = new Vector(0, 0)
     for b in @boids
       if b != boid
         percieved_center = vectorAdd(percieved_center, b.position)
 
     percieved_center = vectorDivide(percieved_center, @boids.length - 1)
     vectorDivide(vectorSubtract(percieved_center, boid.position), @BOID_LEVEL_OF_ATTRACTION)
+
+  rule2: (boid) ->
+    c = new Vector(0, 0)
+    for b in @boids
+      if b != boid
+        if Math.abs( vectorSubtract(b.position, boid.position) ) < 100
+          c = vectorSubtract(c, vectorSubtract(b.position, boid.position) )
+
+    return c
+
+  rule3: (boid) ->
+
+
+
 
   ##########
   # Renderer
