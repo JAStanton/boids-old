@@ -6,7 +6,7 @@
 
     Boids.prototype.boids = [];
 
-    Boids.prototype.BOID_RADIUS = 6;
+    Boids.prototype.BOID_RADIUS = 3;
 
     Boids.prototype.BOID_LEVEL_OF_ATTRACTION = 100;
 
@@ -66,42 +66,32 @@
     };
 
     Boids.prototype.moveBoids = function() {
-      var b, v1, v2, _i, _len, _ref, _results;
+      var b, v1, v2, v3, _i, _len, _ref, _results;
       _ref = this.boids;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         b = _ref[_i];
         v1 = this.rule1(b);
         v2 = this.rule2(b);
-        b.velocity = vectorAdd(vectorAdd(b.velocity, v1), v2);
+        v3 = this.rule3(b);
+        b.velocity = vectorAdd(vectorAdd(vectorAdd(b.velocity, v1), v2), v3);
         _results.push(b.position = vectorAdd(b.position, b.velocity));
       }
       return _results;
     };
 
-    Boids.prototype.drawBoids = function() {
-      var b, _i, _len, _ref, _results;
-      _ref = this.boids;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        b = _ref[_i];
-        _results.push(this.drawCircle(b.position.x, b.position.y));
-      }
-      return _results;
-    };
-
     Boids.prototype.rule1 = function(boid) {
-      var b, percieved_center, _i, _len, _ref;
-      percieved_center = new Vector(0, 0);
+      var b, pc, _i, _len, _ref;
+      pc = new Vector(0, 0);
       _ref = this.boids;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         b = _ref[_i];
         if (b !== boid) {
-          percieved_center = vectorAdd(percieved_center, b.position);
+          pc = vectorAdd(pc, b.position);
         }
       }
-      percieved_center = vectorDivide(percieved_center, this.boids.length - 1);
-      return vectorDivide(vectorSubtract(percieved_center, boid.position), this.BOID_LEVEL_OF_ATTRACTION);
+      pc = vectorDivide(pc, this.boids.length - 1);
+      return vectorDivide(vectorSubtract(pc, boid.position), this.BOID_LEVEL_OF_ATTRACTION);
     };
 
     Boids.prototype.rule2 = function(boid) {
@@ -119,7 +109,30 @@
       return c;
     };
 
-    Boids.prototype.rule3 = function(boid) {};
+    Boids.prototype.rule3 = function(boid) {
+      var b, pv, _i, _len, _ref;
+      pv = new Vector(0, 0);
+      _ref = this.boids;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        b = _ref[_i];
+        if (b !== boid) {
+          pv = vectorAdd(pv, b.velocity);
+        }
+      }
+      pv = vectorDivide(pv, this.boids.length - 1);
+      return vectorDivide(vectorSubtract(pv, boid.velocity), 8);
+    };
+
+    Boids.prototype.drawBoids = function() {
+      var b, _i, _len, _ref, _results;
+      _ref = this.boids;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        b = _ref[_i];
+        _results.push(this.drawCircle(b.position.x, b.position.y));
+      }
+      return _results;
+    };
 
     Boids.prototype.initCanvas = function() {
       this.canvas = document.getElementById(this.options.canvas_id);

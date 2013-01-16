@@ -1,7 +1,7 @@
 class window.Boids
 
   boids: []
-  BOID_RADIUS: 6
+  BOID_RADIUS: 3
   BOID_LEVEL_OF_ATTRACTION: 100
 
   constructor: (options = {}) ->
@@ -55,23 +55,20 @@ class window.Boids
     for b in @boids
       v1 = @rule1 b
       v2 = @rule2 b
-      # v3 = @rule3 b
+      v3 = @rule3 b
 
-      b.velocity = vectorAdd(vectorAdd(b.velocity, v1), v2)
+      b.velocity = vectorAdd(vectorAdd(vectorAdd(b.velocity, v1), v2), v3)
       b.position = vectorAdd(b.position, b.velocity)
 
-  drawBoids: ->
-    for b in @boids
-      @drawCircle b.position.x, b.position.y
 
   rule1: (boid) ->
-    percieved_center = new Vector(0, 0)
+    pc = new Vector(0, 0)
     for b in @boids
       if b != boid
-        percieved_center = vectorAdd(percieved_center, b.position)
+        pc = vectorAdd(pc, b.position)
 
-    percieved_center = vectorDivide(percieved_center, @boids.length - 1)
-    vectorDivide(vectorSubtract(percieved_center, boid.position), @BOID_LEVEL_OF_ATTRACTION)
+    pc = vectorDivide(pc, @boids.length - 1)
+    vectorDivide(vectorSubtract(pc, boid.position), @BOID_LEVEL_OF_ATTRACTION)
 
   rule2: (boid) ->
     c = new Vector(0, 0)
@@ -83,9 +80,17 @@ class window.Boids
     return c
 
   rule3: (boid) ->
+    pv = new Vector(0, 0)
+    for b in @boids
+      if b != boid
+        pv = vectorAdd(pv, b.velocity)
 
+    pv = vectorDivide(pv, @boids.length - 1)
+    vectorDivide( vectorSubtract(pv, boid.velocity) , 8)
 
-
+  drawBoids: ->
+    for b in @boids
+      @drawCircle b.position.x, b.position.y
 
   ##########
   # Renderer
