@@ -2,13 +2,18 @@
 <head>
   <title>Boids</title>
   <link rel="stylesheet" type="text/css" href="css/styles.css">
+  <script type="text/javascript" src="js/stats.js"></script>
   <script type="text/javascript" src="js/boids.js"></script>
 </head>
 <body>
 <canvas id="boids"></canvas>
+
 <script type="text/javascript">
-boids = new Boids("#boids")
-boids.init()
+  boids = new window.Boids({
+    canvas_id: "boids",
+    num: 30,
+  })
 </script>
+
 </body>
 </html>
