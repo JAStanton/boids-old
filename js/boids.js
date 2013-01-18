@@ -6,7 +6,7 @@
 
     Boids.prototype.boids = [];
 
-    Boids.prototype.BOID_RADIUS = 3;
+    Boids.prototype.BOID_RADIUS = 5;
 
     Boids.prototype.BOID_LEVEL_OF_ATTRACTION = 400;
 
@@ -77,7 +77,7 @@
         v1 = this.rule1(b);
         v2 = this.rule2(b);
         v3 = this.rule3(b);
-        b.velocity = b.velocity = vectorAdd(b.velocity, v1);
+        b.velocity = vectorAdd(b.velocity, v1);
         b.velocity = vectorAdd(b.velocity, v2);
         b.velocity = vectorAdd(b.velocity, v3);
         _results.push(b.position = vectorAdd(b.position, b.velocity));
@@ -149,7 +149,7 @@
       a = boid.position;
       b = vectorAdd(boid.position, boid.velocity);
       b = vectorAdd(b, vectorMultiplicationScalar(boid.velocity, 2.5));
-      return this.drawLine(a.x, a.y, b.x, b.y);
+      return this.drawLine(a.x + this.BOID_RADIUS, a.y + this.BOID_RADIUS, b.x + this.BOID_RADIUS, b.y + this.BOID_RADIUS);
     };
 
     Boids.prototype.initCanvas = function() {

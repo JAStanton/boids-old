@@ -1,7 +1,7 @@
 class window.Boids
 
   boids: []
-  BOID_RADIUS: 3
+  BOID_RADIUS: 5
   BOID_LEVEL_OF_ATTRACTION: 400
   draw_boid_velocity: true
 
@@ -55,7 +55,6 @@ class window.Boids
       v1 = @rule1 b
       v2 = @rule2 b
       v3 = @rule3 b
-      b.velocity =
       b.velocity = vectorAdd(b.velocity, v1)
       b.velocity = vectorAdd(b.velocity, v2)
       b.velocity = vectorAdd(b.velocity, v3)
@@ -99,7 +98,7 @@ class window.Boids
     a = boid.position
     b = vectorAdd(boid.position, boid.velocity)
     b = vectorAdd(b, vectorMultiplicationScalar(boid.velocity, 2.5))
-    @drawLine(a.x, a.y, b.x, b.y)
+    @drawLine(a.x + @BOID_RADIUS, a.y  + @BOID_RADIUS, b.x  + @BOID_RADIUS, b.y  + @BOID_RADIUS)
 
   ##########
   # Renderer
