@@ -8,7 +8,9 @@
 
     Boids.prototype.BOID_RADIUS = 3;
 
-    Boids.prototype.BOID_LEVEL_OF_ATTRACTION = 100;
+    Boids.prototype.BOID_LEVEL_OF_ATTRACTION = 400;
+
+    Boids.prototype.draw_boid_velocity = true;
 
     function Boids(options) {
       if (options == null) {
@@ -53,16 +55,17 @@
     };
 
     Boids.prototype.initBoids = function() {
-      var boid, i, max_x, max_y, _i, _ref;
+      var boid, i, max_x, max_y, _i, _ref, _results;
+      _results = [];
       for (i = _i = 0, _ref = this.options.num; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
         boid = {};
         max_x = this.random(0, this.width - this.BOID_RADIUS * 2);
         max_y = this.random(0, this.height - this.BOID_RADIUS * 2);
         boid.position = new Vector(max_x, max_y);
         boid.velocity = new Vector(0, 0);
-        this.boids.push(boid);
+        _results.push(this.boids.push(boid));
       }
-      return console.log(this.boids);
+      return _results;
     };
 
     Boids.prototype.moveBoids = function() {
@@ -74,24 +77,26 @@
         v1 = this.rule1(b);
         v2 = this.rule2(b);
         v3 = this.rule3(b);
-        b.velocity = vectorAdd(vectorAdd(vectorAdd(b.velocity, v1), v2), v3);
+        b.velocity = b.velocity = vectorAdd(b.velocity, v1);
+        b.velocity = vectorAdd(b.velocity, v2);
+        b.velocity = vectorAdd(b.velocity, v3);
         _results.push(b.position = vectorAdd(b.position, b.velocity));
       }
       return _results;
     };
 
     Boids.prototype.rule1 = function(boid) {
-      var b, pc, _i, _len, _ref;
-      pc = new Vector(0, 0);
+      var b, center, _i, _len, _ref;
+      center = new Vector(0, 0);
       _ref = this.boids;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         b = _ref[_i];
         if (b !== boid) {
-          pc = vectorAdd(pc, b.position);
+          center = vectorAdd(center, b.position);
         }
       }
-      pc = vectorDivide(pc, this.boids.length - 1);
-      return vectorDivide(vectorSubtract(pc, boid.position), this.BOID_LEVEL_OF_ATTRACTION);
+      center = vectorDivide(center, this.boids.length - 1);
+      return vectorDivide(vectorSubtract(center, boid.position), this.BOID_LEVEL_OF_ATTRACTION);
     };
 
     Boids.prototype.rule2 = function(boid) {
@@ -129,9 +134,22 @@
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         b = _ref[_i];
-        _results.push(this.drawCircle(b.position.x, b.position.y));
+        this.drawCircle(b.position.x, b.position.y);
+        if (this.draw_boid_velocity) {
+          _results.push(this.drawBoidVelocity(b));
+        } else {
+          _results.push(void 0);
+        }
       }
       return _results;
+    };
+
+    Boids.prototype.drawBoidVelocity = function(boid) {
+      var a, b;
+      a = boid.position;
+      b = vectorAdd(boid.position, boid.velocity);
+      b = vectorAdd(b, vectorMultiplicationScalar(boid.velocity, 2.5));
+      return this.drawLine(a.x, a.y, b.x, b.y);
     };
 
     Boids.prototype.initCanvas = function() {
@@ -143,6 +161,14 @@
     Boids.prototype.setCanvasDimensions = function() {
       this.canvas.width = this.width = document.body.clientWidth;
       return this.canvas.height = this.height = document.body.clientHeight;
+    };
+
+    Boids.prototype.drawLine = function(x1, y1, x2, y2) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(x1, y1);
+      this.ctx.lineTo(x2, y2);
+      this.ctx.strokeStyle = '#FF0000';
+      return this.ctx.stroke();
     };
 
     Boids.prototype.drawCircle = function(x, y) {
@@ -177,6 +203,14 @@
 
   window.vectorDivide = function(_this, scalar) {
     return new Vector(_this.x / scalar, _this.y / scalar);
+  };
+
+  window.vectorLength = function(_this, that) {
+    return Math.sqrt((_this.x * that.x) + (_this.y * that.y));
+  };
+
+  window.vectorMultiplicationScalar = function(v, scalar) {
+    return new Vector(v.x * scalar, v.y * scalar);
   };
 
 }).call(this);

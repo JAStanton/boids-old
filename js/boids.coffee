@@ -2,7 +2,8 @@ class window.Boids
 
   boids: []
   BOID_RADIUS: 3
-  BOID_LEVEL_OF_ATTRACTION: 100
+  BOID_LEVEL_OF_ATTRACTION: 400
+  draw_boid_velocity: true
 
   constructor: (options = {}) ->
     @options = options
@@ -49,26 +50,26 @@ class window.Boids
       boid.velocity = new Vector(0, 0)
       @boids.push boid
 
-    console.log @boids
-
   moveBoids: ->
     for b in @boids
       v1 = @rule1 b
       v2 = @rule2 b
       v3 = @rule3 b
-
-      b.velocity = vectorAdd(vectorAdd(vectorAdd(b.velocity, v1), v2), v3)
+      b.velocity =
+      b.velocity = vectorAdd(b.velocity, v1)
+      b.velocity = vectorAdd(b.velocity, v2)
+      b.velocity = vectorAdd(b.velocity, v3)
       b.position = vectorAdd(b.position, b.velocity)
 
 
   rule1: (boid) ->
-    pc = new Vector(0, 0)
+    center = new Vector(0, 0)
     for b in @boids
       if b != boid
-        pc = vectorAdd(pc, b.position)
+        center = vectorAdd(center, b.position)
 
-    pc = vectorDivide(pc, @boids.length - 1)
-    vectorDivide(vectorSubtract(pc, boid.position), @BOID_LEVEL_OF_ATTRACTION)
+    center = vectorDivide(center, @boids.length - 1)
+    vectorDivide(vectorSubtract(center, boid.position), @BOID_LEVEL_OF_ATTRACTION)
 
   rule2: (boid) ->
     c = new Vector(0, 0)
@@ -91,6 +92,14 @@ class window.Boids
   drawBoids: ->
     for b in @boids
       @drawCircle b.position.x, b.position.y
+      @drawBoidVelocity b if @draw_boid_velocity
+
+
+  drawBoidVelocity: (boid) ->
+    a = boid.position
+    b = vectorAdd(boid.position, boid.velocity)
+    b = vectorAdd(b, vectorMultiplicationScalar(boid.velocity, 2.5))
+    @drawLine(a.x, a.y, b.x, b.y)
 
   ##########
   # Renderer
@@ -108,6 +117,12 @@ class window.Boids
   ##########
   # Drawing
   ##########
+  drawLine: (x1, y1, x2, y2) ->
+    @ctx.beginPath()
+    @ctx.moveTo(x1, y1)
+    @ctx.lineTo(x2, y2)
+    @ctx.strokeStyle = '#FF0000'
+    @ctx.stroke()
 
   drawCircle: (x, y) ->
     @ctx.beginPath()
@@ -137,4 +152,11 @@ window.vectorSubtract = (_this, that) ->
 
 window.vectorDivide = (_this, scalar) ->
   new Vector(_this.x / scalar, _this.y / scalar)
+
+window.vectorLength = (_this, that) ->
+  Math.sqrt((_this.x * that.x) + (_this.y * that.y))
+
+window.vectorMultiplicationScalar = (v, scalar) ->
+  new Vector(v.x * scalar, v.y * scalar)
+
 
